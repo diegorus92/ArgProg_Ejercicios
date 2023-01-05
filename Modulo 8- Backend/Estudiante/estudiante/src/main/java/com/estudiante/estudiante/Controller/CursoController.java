@@ -2,6 +2,7 @@
 package com.estudiante.estudiante.Controller;
 
 import com.estudiante.estudiante.DTO.CursoDTO;
+import com.estudiante.estudiante.DTO.TemaDTO;
 import com.estudiante.estudiante.Model.Curso;
 import com.estudiante.estudiante.Model.Tema;
 import com.estudiante.estudiante.Service.ICursoService;
@@ -53,8 +54,29 @@ public class CursoController {
     }
 
     @GetMapping("/temas/curso/{idcurso}")
-    public List<Tema> getTemasDeCurso(@PathVariable Long idcurso){
-        return interCursoService.obtenerTemasDeCurso(idcurso);
+    @ResponseBody
+    public List<TemaDTO> getTemasDeCurso(@PathVariable Long idcurso){
+        List<Tema> temasDeCurso = interCursoService.obtenerTemasDeCurso(idcurso);
+        List<TemaDTO> temasDTODeCurso = new ArrayList();
+        for(Tema t : temasDeCurso){
+            temasDTODeCurso.add(new TemaDTO(t.getId_tema(),t.getNombre(), t.getDescripcion()));
+        }
+        
+        return temasDTODeCurso;
+    }
+
+    @GetMapping("/cursos/buscar")
+    @ResponseBody
+    public List<CursoDTO> buscarCursosPorNombre(@RequestParam("nombre") String nombre){
+        List<Curso> cursos = interCursoService.obtenerCursos();
+        List<CursoDTO> cursosEncontrados = new ArrayList();
+        
+        for(Curso c : cursos){
+            if(c.getNombre().contains(nombre))
+                cursosEncontrados.add(new CursoDTO(c.getNombre(), c.getTipo_curso(), c.getFecha_finalizacion()));
+        }
+
+        return cursosEncontrados;
     }
 
     @PutMapping("/cursos/editar/{idcurso}")
